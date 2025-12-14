@@ -26,14 +26,18 @@ const bookSchema = new mongoose.Schema(
       type: Number,
       required: [true, "Year published is required"],
     },
-    borrower: {
-      type: String,
-      default: null
-    },
-    dueDate: {
-      type: Date,
-      default: null
-    }
+    // FIELD PARA MAHIBAROAN KUN HIN-O AN NAGHIRAM HAN LIBRO
+borrower: {
+  type: String,        // String ini kay ngaran han borrower (pananglitan: "Juan Dela Cruz")
+  default: null        // Default = null, buot sidngon waray naghihiram kon diri pa borrowed
+},
+
+// FIELD PARA MAHIBAROAN KUN SAN-O IBABALIK AN LIBRO
+dueDate: {
+  type: Date,          // Date ini kay petsa han pagbalik han libro
+  default: null        // Default = null kon waray pa due date (waray pa ginborrow)
+}
+
     
   },
   { timestamps: true } // Automatic nga add han createdAt ngan updatedAt
