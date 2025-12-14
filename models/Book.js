@@ -26,10 +26,10 @@ const bookSchema = new mongoose.Schema(
       type: Number,
       required: [true, "Year published is required"],
     },
-    // FIELD PARA MAHIBAROAN KUN HIN-O AN NAGHIRAM HAN LIBRO
+    // FIELD PARA MAHIBAROAN KUN HIN-O AN NANHURAM HAN LIBRO
 borrower: {
-  type: String,        // String ini kay ngaran han borrower (pananglitan: "Juan Dela Cruz")
-  default: null        // Default = null, buot sidngon waray naghihiram kon diri pa borrowed
+  type: String,        // String ini kay ngaran han borrower (ex. "Juan Dela Cruz")
+  default: null        // Default = null, buot sidngon waray nanhuram kon diri pa borrowed
 },
 
 // FIELD PARA MAHIBAROAN KUN SAN-O IBABALIK AN LIBRO
