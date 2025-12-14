@@ -48,6 +48,4 @@ router.delete("/books/:id", deleteBook);
 // Update libro gamit an ID
 router.put("/books/:id", updateBook);
 
-
-
 export default router;
