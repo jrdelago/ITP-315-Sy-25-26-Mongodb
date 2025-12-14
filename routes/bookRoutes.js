@@ -40,7 +40,4 @@ router.delete("/books/:id", deleteBook);
 // Update libro gamit an ID
 router.put("/books/:id", updateBook);
 
-// GET total number of books
-router.get("/books/total", getTotalBooks);
-
 export default router;
