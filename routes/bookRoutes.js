@@ -8,13 +8,21 @@ import {
   getBooksByGenre,
   getTotalBooks,
   borrowBook,
-  returnBook
+  returnBook,
+  getAllGenres,
+  getAllAuthors
 } from "../controllers/booksController.js";
 
 const router = express.Router();
 
 // Kuha tanan libro
 router.get("/books", getAllBooks);
+
+// GET list of all genres
+router.get("/books/genres", getAllGenres);
+
+// GET list of all authors
+router.get("/books/authors", getAllAuthors);
 
 // GET total number of books
 router.get("/books/total", getTotalBooks);
@@ -39,5 +47,7 @@ router.delete("/books/:id", deleteBook);
 
 // Update libro gamit an ID
 router.put("/books/:id", updateBook);
+
+
 
 export default router;

@@ -183,6 +183,36 @@ export const returnBook = async (req, res) => {
   }
 };
 
+// PAG KUHA HAN LIST HAN NGATANAN NGA GENRES HA LIBRARY
+export const getAllGenres = async (req, res) => {
+  try {
+    // Pag kuha han distinct genre values tikang ha database
+    const genres = await Book.distinct("genre");
 
+    if (genres.length === 0) {
+      return errorResponse(res, 404, "No genres found in the library");
+    }
+
+    successResponse(res, 200, "Genres retrieved successfully", genres);
+  } catch (error) {
+    errorResponse(res, 500, "An error occurred while retrieving genres", error);
+  }
+};
+
+// PAG KUHA HAN LIST HAN NGATANAN NGA AUTHORS HA LIBRARY
+export const getAllAuthors = async (req, res) => {
+  try {
+    // Pag kuha han distinct author values tikang ha database
+    const authors = await Book.distinct("author");
+
+    if (authors.length === 0) {
+      return errorResponse(res, 404, "No authors found in the library");
+    }
+
+    successResponse(res, 200, "Authors retrieved successfully", authors);
+  } catch (error) {
+    errorResponse(res, 500, "An error occurred while retrieving authors", error);
+  }
+};
 
 
