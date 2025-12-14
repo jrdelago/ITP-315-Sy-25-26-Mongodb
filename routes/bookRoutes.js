@@ -4,14 +4,43 @@ import {
   createBook,
   deleteBook,
   updateBook,
-} from "../Controllers/booksController.js";
+  getBookById,
+  getBooksByGenre,
+  getTotalBooks,
+  borrowBook,
+  returnBook
+} from "../controllers/booksController.js";
 
 const router = express.Router();
 
+// Kuha tanan libro
 router.get("/books", getAllBooks);
+
+// GET total number of books
+router.get("/books/total", getTotalBooks);
+
+// GET books by genre
+router.get("/books/genre", getBooksByGenre);
+
+// GET book by ID
+router.get("/books/:id", getBookById);
+
+// BORROW a book
+router.put("/books/borrow/:id", borrowBook);
+
+// RETURN a book
+router.put("/books/return/:id", returnBook);
+
+// Create bag-o nga libro
 router.post("/books", createBook);
-// pag add han delete route pero gamiton an query parameter para ha ID
-router.delete("/books", deleteBook);
+
+// Delete libro gamit an ID
+router.delete("/books/:id", deleteBook);
+
+// Update libro gamit an ID
 router.put("/books/:id", updateBook);
+
+// GET total number of books
+router.get("/books/total", getTotalBooks);
 
 export default router;

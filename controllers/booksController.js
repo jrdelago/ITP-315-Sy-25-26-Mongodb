@@ -1,93 +1,188 @@
 import Book from "../models/Book.js";
 import { successResponse, errorResponse } from "../helpers/responseHelper.js";
 
+// PAG KUHA HAN NGATANAN NGA LIBRO
 export const getAllBooks = async (req, res) => {
   try {
-    // pag kuha han ngatanan nga libro tikang ha database
+    // Kuha han tanan libro tikang ha database
     const books = await Book.find();
-
-    // inen is handler para haligot la an pag sesend hin success response
+    // Send hin success response gamit an helper
     successResponse(res, 200, "Books retrieved successfully", books);
   } catch (error) {
-    //same adi pag pa haligot la an response pag may error
+    // Kon may error ha pagkuha
     errorResponse(res, 500, "An error occurred while retrieving books", error);
   }
 };
 
-// dapat naka async kay database operation ini
+// PAG KUHA HAN BOOK PINAAGI HAN ID
+export const getBookById = async (req, res) => {
+  try {
+    // Kuha han ID tikang ha route parameters
+    const id = Number(req.params.id);
+
+    // Validation: kon diri valid nga number
+    if (isNaN(id)) return errorResponse(res, 400, "Invalid book ID");
+
+    // Kuha han libro tikang ha database
+    const book = await Book.findById(id);
+
+    // Kon waray makita nga libro
+    if (!book) return errorResponse(res, 404, "Book not found");
+
+    // Kon may makita, send success response
+    successResponse(res, 200, "Book retrieved successfully", book);
+  } catch (error) {
+    errorResponse(res, 500, "An error occurred while retrieving the book", error);
+  }
+};
+
+// PAG KUHA HAN NGATANAN NGA BOOKS PINAAGI HAN GENRE
+export const getBooksByGenre = async (req, res) => {
+  try {
+    // Kuha han genre tikang ha query parameters
+    const genre = req.query.genre;
+
+    // Validation: kon waray genre ginhatag
+    if (!genre) return errorResponse(res, 400, "Genre is required");
+
+    // Kuha han tanan libro nga pareho an genre (case-insensitive)
+    const books = await Book.find({ genre: { $regex: new RegExp(`^${genre}$`, "i") } });
+
+    // Kon waray makita nga libro
+    if (books.length === 0) return errorResponse(res, 404, "No books found for this genre");
+
+    // Send success response
+    successResponse(res, 200, "Books retrieved successfully", books);
+  } catch (error) {
+    errorResponse(res, 500, "An error occurred while retrieving books by genre", error);
+  }
+};
+
+
+
+// PAG CREATE HAN BAG-O NGA LIBRO
 export const createBook = async (req, res) => {
   try {
-    // pag extract han data tikang ha request body
-    const { title, author, genre, year_published } = req.body;
+    const { _id, title, author, genre, year_published } = req.body;
 
-    // simple validation
-    if (!title || !author || !genre || !year_published) {
-      errorResponse(res, 400, "All book fields are required");
-      return;
+    // Validation han required fields
+    if (_id === undefined || !title || !author || !genre || !year_published) {
+      return errorResponse(res, 400, "All book fields are required");
     }
 
-    // pag create han bag-o nga libro ha database
-    const newBook = await Book.create({
-      title,
-      author,
-      genre,
-      year_published,
-    });
+    const id = Number(_id);
+    if (isNaN(id)) return errorResponse(res, 400, "Invalid book ID");
 
-    // pag send han success response gamit an helper
+    // Check kon may existing nga libro nga pareho ID
+    const existingBook = await Book.findById(id);
+    if (existingBook) return errorResponse(res, 400, "A book with this ID already exists");
+
+    // Pag create han libro
+    const newBook = await Book.create({ _id: id, title, author, genre, year_published });
+
     successResponse(res, 201, "Book created successfully", newBook);
   } catch (error) {
     errorResponse(res, 500, "An error occurred while creating the book", error);
   }
 };
 
+// PAG DELETE HAN LIBRO
 export const deleteBook = async (req, res) => {
   try {
-    // pag extract han book ID tikang ha request query parameters
-    const { id } = req.query;
+    const id = Number(req.params.id);
+    if (isNaN(id)) return errorResponse(res, 400, "Invalid book ID");
 
-    // simple validation
-    if (!id) {
-      errorResponse(res, 400, "Book ID is required");
-      return;
-    }
-
-    // pag delete han libro tikang ha database
     const book = await Book.findByIdAndDelete(id);
-    if (!book) {
-      errorResponse(res, 404, "Book not found");
-      return;
-    }
+    if (!book) return errorResponse(res, 404, "Book not found");
 
-    // kon ma delete na, pag send han success response
     successResponse(res, 200, "Book deleted successfully");
   } catch (error) {
     errorResponse(res, 500, "An error occurred while deleting the book", error);
   }
 };
 
+// PAG UPDATE HAN LIBRO
 export const updateBook = async (req, res) => {
   try {
-    // pag extract han book ID tikang ha request parameters
-    const { id } = req.params;
-    // pag extract han updated data tikang ha request body
+    const id = Number(req.params.id);
+    if (isNaN(id)) return errorResponse(res, 400, "Invalid book ID");
+
     const { title, author, genre, year_published } = req.body;
 
-    // pag update han libro ha database
     const book = await Book.findByIdAndUpdate(
       id,
       { title, author, genre, year_published },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true } // Para makuha an updated book
     );
 
-    // kon waray ma update, pag send hin 404 response
-    if (!book) {
-      errorResponse(res, 404, "Book not found");
-      return;
-    }
-    // pag send han success response
+    if (!book) return errorResponse(res, 404, "Book not found");
+
     successResponse(res, 200, "Book updated successfully", book);
   } catch (error) {
     errorResponse(res, 500, "An error occurred while updating the book", error);
   }
 };
+
+// PAG KUHA HAN TOTAL NUMBER HAN BOOKS HA LIBRARY
+export const getTotalBooks = async (req, res) => {
+  try {
+    // Kuha han total number han books tikang ha database
+    const total = await Book.countDocuments();
+
+    // Pag send han success response
+    successResponse(res, 200, "Total number of books retrieved successfully", { total });
+  } catch (error) {
+    errorResponse(res, 500, "An error occurred while counting the books", error);
+  }
+};
+
+// PAG BORROW HAN BOOK
+export const borrowBook = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { borrower, dueDate } = req.body;
+
+    if (!borrower || !dueDate) {
+      return errorResponse(res, 400, "Borrower name and due date are required");
+    }
+
+    const book = await Book.findById(id);
+    if (!book) return errorResponse(res, 404, "Book not found");
+
+    if (book.borrower) return errorResponse(res, 400, "Book is already borrowed");
+
+    book.borrower = borrower;
+    book.dueDate = new Date(dueDate);
+
+    await book.save();
+
+    successResponse(res, 200, "Book borrowed successfully", book);
+  } catch (error) {
+    errorResponse(res, 500, "An error occurred while borrowing the book", error);
+  }
+};
+
+// PAG RETURN HAN BOOK
+export const returnBook = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const book = await Book.findById(id);
+    if (!book) return errorResponse(res, 404, "Book not found");
+
+    if (!book.borrower) return errorResponse(res, 400, "Book is not currently borrowed");
+
+    book.borrower = null;
+    book.dueDate = null;
+
+    await book.save();
+
+    successResponse(res, 200, "Book returned successfully", book);
+  } catch (error) {
+    errorResponse(res, 500, "An error occurred while returning the book", error);
+  }
+};
+
+
+
+
